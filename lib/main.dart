@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_sqlite/db_helper.dart';
-import 'package:flutter_sqlite/home.dart';
 
-void main() => runApp(MyApp());
+import 'splash.dart';
 
-class MyApp extends StatelessWidget {
+main() {
+  runApp(
+    EudekaApp(),
+  );
+}
+
+class EudekaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // create and initialize database
-    DBHelper.createDatabase();
     return MaterialApp(
-      home: HomePage(),
+      home: SplashPage(),
     );
   }
 }

@@ -1,9 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_sqlite/db_helper.dart';
-import 'package:flutter_sqlite/detail.dart';
-import 'package:flutter_sqlite/model.dart';
+
+import 'database_helper.dart';
+import 'detail.dart';
+import 'model.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -11,77 +10,61 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // initialize list of user
-  List<User> listUser = List();
+  List<Model> _listModel = List();
 
-  readUsers() async {
-    // waiting for read all users at database
-    List<User> users = await DBHelper.readUsers();
+  void readAllData() async {
+    List<Model> models = await DatabaseHelper.readAll();
     setState(() {
-      // set all users to list of user
-      listUser = users != null ? users : List();
+      if (models != null) {
+        _listModel = models;
+      } else {
+        _listModel = List();
+      }
     });
   }
 
-  checkFirst() async {
-    // waiting for a second then read users
-    return Timer(Duration(seconds: 1), readUsers);
+  void openDetail([Model model]) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return DetailPage(
+          model: model,
+        );
+      },
+    ).then((_) {
+      readAllData();
+    });
   }
 
   @override
   void initState() {
+    readAllData();
     super.initState();
-    // checking users for the first time
-    checkFirst();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${listUser.length} datas'),
+        title: Text("Eudeka! Flutter Basic"),
       ),
-      body: ListView.builder(
-        itemCount: listUser.length,
+      body: ListView.separated(
+        itemCount: _listModel.length,
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
-            title: Text(listUser[index].name),
-            subtitle: Text(listUser[index].email),
+            title: Text(_listModel[index].content),
             onTap: () {
-              // show the dialog for edit or delete user
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return Detail(
-                    user: User(
-                      id: listUser[index].id,
-                      name: listUser[index].name,
-                      email: listUser[index].email,
-                    ),
-                  );
-                },
-              ).then((_) {
-                // after dialog is showing check users again
-                readUsers();
-              });
+              openDetail(_listModel[index]);
             },
           );
+        },
+        separatorBuilder: (BuildContext context, int index) {
+          return Divider();
         },
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () {
-          // show the dialog for add new user
-          showDialog(
-            context: context,
-            builder: (context) {
-              return Detail();
-            },
-          ).then((_) {
-            // after dialog is showing check users again
-            readUsers();
-          });
-        },
+        onPressed: openDetail,
       ),
     );
   }

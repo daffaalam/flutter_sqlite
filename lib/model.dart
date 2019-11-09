@@ -1,15 +1,16 @@
-class User {
+class Model {
   int id;
-  String name;
-  String email;
+  String content;
 
-  User({this.id, this.name, this.email});
+  Model({
+    this.id,
+    this.content,
+  });
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'name': name,
-      'email': email,
+      "id": id,
+      "content": content,
     };
   }
 }
