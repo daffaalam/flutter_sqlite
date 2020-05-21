@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'database_helper.dart';
+import '../database/database_helper.dart';
+import '../model/model_content.dart';
 import 'detail.dart';
-import 'model.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -10,35 +10,30 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Model> _listModel = List();
+  List<ModelContent> _listModel;
 
-  void readAllData() async {
-    List<Model> models = await DatabaseHelper.readAll();
-    setState(() {
-      if (models != null) {
-        _listModel = models;
-      } else {
-        _listModel = List();
-      }
-    });
+  void _readAllData() async {
+    _listModel = await DatabaseHelper.readAll();
+    setState(() {});
   }
 
-  void openDetail([Model model]) {
+  void _openDetail([ModelContent content]) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return DetailPage(
-          model: model,
+          content: content,
         );
       },
+      barrierDismissible: false,
     ).then((_) {
-      readAllData();
+      _readAllData();
     });
   }
 
   @override
   void initState() {
-    readAllData();
+    _readAllData();
     super.initState();
   }
 
@@ -48,23 +43,23 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text("Eudeka! Flutter Basic"),
       ),
-      body: ListView.separated(
-        itemCount: _listModel.length,
+      body: ListView.builder(
+        itemCount: _listModel?.length ?? 0,
         itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            title: Text(_listModel[index].content),
-            onTap: () {
-              openDetail(_listModel[index]);
-            },
+          ModelContent _modelContent = _listModel[index];
+          return Card(
+            child: ListTile(
+              title: Text(_modelContent.content),
+              onTap: () {
+                _openDetail(_modelContent);
+              },
+            ),
           );
-        },
-        separatorBuilder: (BuildContext context, int index) {
-          return Divider();
         },
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: openDetail,
+        onPressed: _openDetail,
       ),
     );
   }

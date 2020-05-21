@@ -1,18 +1,30 @@
 import 'package:flutter/material.dart';
 
-import 'splash.dart';
+import 'config/constant.dart';
+import 'view/home.dart';
+import 'view/splash.dart';
 
 main() {
   runApp(
-    EudekaApp(),
+    MainApp(),
   );
 }
 
-class EudekaApp extends StatelessWidget {
+class MainApp extends StatelessWidget {
+  final Map<String, WidgetBuilder> _routes = <String, WidgetBuilder>{
+    Constant.splashRoute: (BuildContext context) {
+      return SplashPage();
+    },
+    Constant.homeRoute: (BuildContext context) {
+      return HomePage();
+    },
+  };
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: SplashPage(),
+      routes: _routes,
+      initialRoute: Constant.splashRoute,
     );
   }
 }
