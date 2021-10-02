@@ -1,73 +1,77 @@
 import 'package:sqflite/sqflite.dart';
 
-import '../config/constant.dart';
+import '../common/constant.dart';
 import '../model/model_content.dart';
 
 class DatabaseHelper {
-  static Database _database;
+  DatabaseHelper._();
 
-  static Future<Database> createDatabase() async {
+  static final DatabaseHelper instance = DatabaseHelper._();
+
+  static Database? _database;
+
+  Future<Database> get database async {
+    if (_database != null) return _database!;
     _database = await openDatabase(
       Constant.databaseName,
       version: 1,
       onCreate: (Database database, int version) async {
         await database.execute(
-          "CREATE TABLE ${Constant.tableName} "
-          "("
-          "${Constant.fieldId} INTEGER PRIMARY KEY AUTOINCREMENT, "
-          "${Constant.fieldContent} TEXT"
-          ")",
+          'CREATE TABLE ${Constant.tableName} '
+          '('
+          '${Constant.fieldId} INTEGER PRIMARY KEY AUTOINCREMENT, '
+          '${Constant.fieldContent} TEXT'
+          ')',
         );
       },
     );
-    return _database;
+    return _database!;
   }
 
-  static Future<int> insert(ModelContent model) async {
-    int _response = await _database.insert(
+  Future<int> insert(ModelContent model) async {
+    Database db = await instance.database;
+    int response = await db.insert(
       Constant.tableName,
       model.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.ignore,
     );
-    return _response;
+    return response;
   }
 
-  static Future<List<ModelContent>> readAll() async {
-    List<Map<String, dynamic>> _maps = await _database.query(
+  Future<List<ModelContent>> readAll() async {
+    Database db = await instance.database;
+    List<Map<String, Object?>> maps = await db.query(
       Constant.tableName,
     );
-    if (_maps.length > 0) {
-      return List.generate(
-        _maps.length,
-        (int index) {
-          Map<String, dynamic> _field = _maps[index];
-          return ModelContent(
-            id: _field[Constant.fieldId],
-            content: _field[Constant.fieldContent],
-          );
-        },
-      );
-    } else {
-      return null;
-    }
+    return List<ModelContent>.generate(
+      maps.length,
+      (int index) {
+        Map<String, Object?> field = maps[index];
+        return ModelContent(
+          id: field[Constant.fieldId] as int,
+          content: field[Constant.fieldContent] as String,
+        );
+      },
+    );
   }
 
-  static Future<int> update(ModelContent model) async {
-    int _response = await _database.update(
+  Future<int> update(ModelContent model) async {
+    Database db = await instance.database;
+    int response = await db.update(
       Constant.tableName,
       model.toMap(),
       where: "${Constant.fieldId} = ?",
       whereArgs: [model.id],
     );
-    return _response;
+    return response;
   }
 
-  static Future<int> delete(int id) async {
-    int _response = await _database.delete(
+  Future<int> delete(int id) async {
+    Database db = await instance.database;
+    int response = await db.delete(
       Constant.tableName,
       where: "${Constant.fieldId} = ?",
       whereArgs: [id],
     );
-    return _response;
+    return response;
   }
 }

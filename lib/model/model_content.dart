@@ -1,16 +1,16 @@
-import '../config/constant.dart';
+import '../common/constant.dart';
 
 class ModelContent {
-  int id;
-  String content;
-
   ModelContent({
     this.id,
-    this.content,
+    required this.content,
   });
 
+  int? id;
+  String content;
+
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       Constant.fieldId: id,
       Constant.fieldContent: content,
     };

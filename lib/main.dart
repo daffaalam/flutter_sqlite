@@ -1,30 +1,17 @@
 import 'package:flutter/material.dart';
 
-import 'config/constant.dart';
-import 'view/home.dart';
-import 'view/splash.dart';
+import 'common/app_route.dart';
 
-main() {
-  runApp(
-    MainApp(),
-  );
-}
+main() => runApp(const MainApp());
 
 class MainApp extends StatelessWidget {
-  final Map<String, WidgetBuilder> _routes = <String, WidgetBuilder>{
-    Constant.splashRoute: (BuildContext context) {
-      return SplashPage();
-    },
-    Constant.homeRoute: (BuildContext context) {
-      return HomePage();
-    },
-  };
+  const MainApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      routes: _routes,
-      initialRoute: Constant.splashRoute,
+      routes: AppRoute.routes,
+      initialRoute: AppRoute.home,
     );
   }
 }
